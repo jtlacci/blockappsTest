@@ -1,13 +1,13 @@
 pragma solidity ^0.4.18;
 
-contract Lottery {SimpleStorage
+contract Lottery {
 
   uint ticketPrice;
   uint ticketCount;
 
   mapping(address => uint) userTickets;
 
-  bytes[] tickets;
+  address[] tickets;
 
   function activate(uint _price, uint _count){
     ticketPrice = _price;
@@ -21,8 +21,8 @@ contract Lottery {SimpleStorage
     return ticketCount;
   }
 
-  function buy(){
-    address user = msg.sender
+  function buy() payable {
+    address user = msg.sender;
     require(msg.value == ticketPrice);
     // adds address to ticket array
     tickets.push(user);
@@ -30,5 +30,8 @@ contract Lottery {SimpleStorage
     userTickets[user]+= 1;
   }
 
+  function myTickets() returns(uint tickets){
+    return userTickets[msg.sender];
+  }
 
 }
