@@ -22,6 +22,7 @@ contract Lottery {
   }
 
   function buy() payable {
+    require(checkSold());
     address user = msg.sender;
     require(msg.value == ticketPrice);
     // adds address to ticket array
@@ -32,6 +33,14 @@ contract Lottery {
 
   function myTickets() returns(uint tickets){
     return userTickets[msg.sender];
+  }
+
+  function checkSold() private returns(bool success){
+    if(tickets.length >= ticketCount +1){
+      //end game
+      return true;
+    }
+    return true;
   }
 
 }
