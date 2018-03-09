@@ -7,7 +7,13 @@ contract Lottery {
 
   mapping(address => uint) userTickets;
 
+  enum gState {InProgress, Ended};
+
+  gState currState;
+
   address[] tickets;
+
+  address winner = 0x0;
 
   function activate(uint _price, uint _count){
     ticketPrice = _price;
@@ -22,13 +28,21 @@ contract Lottery {
   }
 
   function buy() payable {
-    require(checkSold());
-    address user = msg.sender;
-    require(msg.value == ticketPrice);
-    // adds address to ticket array
-    tickets.push(user);
-    //increment user's tickets
-    userTickets[user]+= 1;
+      require(checkSold());
+      if(currState == gState.InProgress){
+      address user = msg.sender;
+      require(msg.value == ticketPrice);
+      // adds address to ticket array
+      tickets.push(user);
+      //increment user's tickets
+      userTickets[user]+= 1;
+    }
+  }
+
+  function withdraw(){
+    require(msg.sender == winner){
+      msg.sender.transfer((ticketCount-1)*ticketPrice);
+    }
   }
 
   function myTickets() returns(uint tickets){
@@ -37,10 +51,15 @@ contract Lottery {
 
   function checkSold() private returns(bool success){
     if(tickets.length >= ticketCount +1){
-      //end game
+      endGame();
       return true;
     }
     return true;
+  }
+
+  function endGame() private{
+    currState = gState.Ended;
+    winner = tickets[(now % tickets.length)];
   }
 
 }
